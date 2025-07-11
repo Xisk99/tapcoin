@@ -16,7 +16,7 @@ export default function App() {
   const [tokenBalance, setTokenBalance] = useState(0); // Initialize token balance to 0
   const [isFetchingBalance, setIsFetchingBalance] = useState(false); // Added state to track if balance is being fetched
 
-  const TOKEN_ADDRESS = '6ZoXwAMUT5HpB4Lg2Bt5bz5iTnEhUrfuBKJgstkwpump';
+  const TOKEN_ADDRESS = '6vhEL3UctR5s94ctmrPYVnEp9meDxJxVxcSidfcWpump';
   const RPC_ENDPOINT = 'https://go.getblock.io/4136d34f90a6488b84214ae26f0ed5f4';
 
   const getClickCount = async () => {
@@ -177,7 +177,7 @@ export default function App() {
           marginLeft: '16px',
           marginRight: '16px'
         }}>
-          You must hold the token to tap. Creator private key will be revealed only to holders when we reach 100,000,000 clicks, 50% for me / 50% for the lucky and faster one.
+          You must hold the token to tap. Creator private key will be revealed only to holders when we reach 1,000,000 clicks, 50% for me / 50% for the lucky and faster one.
         </p>
 
         {/* Contador */}
@@ -210,7 +210,7 @@ export default function App() {
           marginTop: '16px',
           borderRadius: '8px'
         }}>
-          <p>Placeholder private key, will show at 100,000,000 clicks</p>
+          <p>Placeholder private key, will show at 1,000,000 clicks</p>
         </div>
       </div>
     </div>
