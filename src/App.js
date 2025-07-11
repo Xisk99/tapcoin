@@ -1,19 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { PublicKey, Connection } from '@solana/web3.js';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc, setDoc, increment } from 'firebase/firestore';
+import { createClient } from '@supabase/supabase-js';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCFXeIdfLbid7H5o6w0cve-snURAka0d7E",
-  authDomain: "tapcoin-336ca.firebaseapp.com",
-  projectId: "tapcoin-336ca",
-  storageBucket: "tapcoin-336ca.firebasestorage.app",
-  messagingSenderId: "546350623544",
-  appId: "1:546350623544:web:8dba4be4738567da25afcd"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function App() {
   const [walletAddress, setWalletAddress] = useState(null);
@@ -21,18 +12,25 @@ export default function App() {
   const [clicked, setClicked] = useState(false);
   const [clickCount, setClickCount] = useState(0);
   const [lastClickTime, setLastClickTime] = useState(0);
+  const [tokenBalance, setTokenBalance] = useState(0); // Initialize token balance to 0
+  const [isFetchingBalance, setIsFetchingBalance] = useState(false); // Added state to track if balance is being fetched
 
   const TOKEN_ADDRESS = '6ZoXwAMUT5HpB4Lg2Bt5bz5iTnEhUrfuBKJgstkwpump';
   const RPC_ENDPOINT = 'https://go.getblock.io/4136d34f90a6488b84214ae26f0ed5f4';
 
   const getClickCount = async () => {
-    const docRef = doc(db, "counter", "taps");
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return docSnap.data().count;
-    } else {
+    const { data, error } = await supabase
+      .from('taps')
+      .select('counter')
+      .eq('id', 1)
+      .single();
+
+    if (error) {
+      console.error('Error fetching click count:', error);
       return 0;
     }
+
+    return data.counter;
   };
 
   useEffect(() => {
@@ -44,6 +42,7 @@ export default function App() {
   }, []);
 
   const checkTokenBalance = async (publicKeyStr) => {
+    setIsFetchingBalance(true); // Set fetching balance to true
     try {
       const connection = new Connection(RPC_ENDPOINT);
       const accounts = await connection.getParsedTokenAccountsByOwner(
@@ -53,9 +52,13 @@ export default function App() {
       const balance =
         accounts.value[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0;
       setHasToken(balance > 0);
+      setTokenBalance(balance); // Set token balance state
     } catch (error) {
       console.error('Error checking token balance:', error);
       setHasToken(false);
+      setTokenBalance(0); // Reset token balance state on error
+    } finally {
+      setIsFetchingBalance(false); // Set fetching balance to false
     }
   };
 
@@ -89,15 +92,18 @@ export default function App() {
     }
     setLastClickTime(Date.now());
     setClicked(true);
-    setTimeout(() => setClicked(false), 200);
+    setTimeout(() => setClicked(false), 500);
 
-    const docRef = doc(db, "counter", "taps");
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      await setDoc(docRef, { count: increment(1) }, { merge: true });
-    } else {
-      await setDoc(docRef, { count: 1 });
+    const { error } = await supabase
+      .from('taps')
+      .update({ counter: clickCount + 1 })
+      .eq('id', 1);
+
+    if (error) {
+      console.error('Error updating click count:', error);
+      return;
     }
+
     const count = await getClickCount();
     setClickCount(count);
   };
@@ -133,6 +139,17 @@ export default function App() {
           {walletAddress ?? "Connect Phantom Wallet"}
         </button>
 
+        {/* $TAPCOIN balance indicator */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: '16px'
+        }}>
+          <p style={{ marginRight: '8px' }}>$TAPCOIN Balance:</p>
+          <p>{isFetchingBalance ? 'Loading...' : tokenBalance}</p>
+        </div>
+
         {/* Imagen */}
         <div
           onClick={handleClick}
@@ -159,7 +176,7 @@ export default function App() {
           marginLeft: '16px',
           marginRight: '16px'
         }}>
-          You must hold the token to tap. Creator private key will be revealed only to holders when we reach 1,000,000,000 clicks, 50% for me / 50% for the lucky and faster one.
+          You must hold the token to tap. Creator private key will be revealed only to holders when we reach 100,000,000 clicks, 50% for me / 50% for the lucky and faster one.
         </p>
 
         {/* Contador */}
