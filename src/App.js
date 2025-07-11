@@ -210,7 +210,7 @@ export default function App() {
           marginTop: '16px',
           borderRadius: '8px'
         }}>
-          <p>Placeholder private key, will show at 1,000,000 clicks</p>
+          <p>First part of the private key: 5v6XE5tDcANWaj6Hcz6gvR15KuFnTkJAh4EXQM..., full will show at 1,000,000 clicks</p>
         </div>
       </div>
     </div>
