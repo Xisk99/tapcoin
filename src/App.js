@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { PublicKey, Connection } from '@solana/web3.js';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.REACT_APP_VERCEL_SUPABASE_URL;
+const supabaseAnonKey = process.env.REACT_APP_VERCEL_SUPABASE_ANON_KEY;
 console.log('Environment Variables:', process.env);
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
