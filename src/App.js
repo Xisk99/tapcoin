@@ -6,6 +6,8 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+console.log('Environment Variables:', process.env);
+
 export default function App() {
   const [walletAddress, setWalletAddress] = useState(null);
   const [hasToken, setHasToken] = useState(false);
@@ -17,10 +19,6 @@ export default function App() {
 
   const TOKEN_ADDRESS = '6ZoXwAMUT5HpB4Lg2Bt5bz5iTnEhUrfuBKJgstkwpump';
   const RPC_ENDPOINT = 'https://go.getblock.io/4136d34f90a6488b84214ae26f0ed5f4';
-
-  useEffect(() => {
-    console.log('Environment Variables:', process.env);
-  }, []);
 
   const getClickCount = async () => {
     const { data, error } = await supabase
